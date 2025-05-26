@@ -45,8 +45,8 @@ const CartItem = ({ item, token, onUpdate }: CartItemProps) => {
   const [loadingProduct, setLoadingProduct] = useState(true);
 
   // Defensive check - return null if item is invalid
-  if (!item || !item.product_id) {
-    console.warn('Invalid cart item:', item);
+  if (!item || typeof item.product_id !== 'number') {
+    console.error('Invalid or missing product_id in cart item:', item);
     return null;
   }
 
@@ -122,7 +122,7 @@ const CartItem = ({ item, token, onUpdate }: CartItemProps) => {
   };
 
   // Safe calculation with fallback values
-  const safeQuantity = item.quantity || 0;
+  const safeQuantity = typeof item.quantity === 'number' && item.quantity > 0 ? item.quantity : 1;
   // Use product price if available, fallback to cart item price
   const safePrice = product?.price || item.price || 0;
   const totalPrice = safeQuantity * safePrice;
