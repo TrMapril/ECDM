@@ -21,12 +21,12 @@ const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
     <Card sx={{ margin: 1, width: 200 }}>
       <CardContent>
         <Typography variant="h6">{product.name}</Typography>
-        <Typography>Price: ${product.price}</Typography>
-        <Typography>Category: {product.category}</Typography>
-        <Typography>Publisher: {product.publisher}</Typography>
+        <Typography>Giá: {product.price}VND</Typography>
+        <Typography>Thể loại: {product.category}</Typography>
+        <Typography>NXB: {product.publisher}</Typography>
         {onAddToCart && (
           <Button variant="contained" onClick={handleAddToCart} sx={{ mt: 1 }}>
-            Add to Cart
+            Thêm vào giỏ
           </Button>
         )}
       </CardContent>

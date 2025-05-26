@@ -9,7 +9,7 @@ const Header = () => {
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          E-Commerce
+          CHÀO MỪNG ĐẾN VỚI CỬA HÀNG SÁCH TRỰC TUYẾN
         </Typography>
         <Button color="inherit" component={Link} to="/">
           Home
@@ -17,14 +17,14 @@ const Header = () => {
         {user ? (
           <>
             <Button color="inherit" component={Link} to="/cart">
-              Cart
+              Giỏ hàng
             </Button>
             <Button color="inherit" component={Link} to="/orders">
-              Orders
+              Đơn hàng
             </Button>
             {user.role === 'admin' && (
               <Button color="inherit" component={Link} to="/admin/products">
-                Manage Products
+                Quản lí
               </Button>
             )}
             <Button color="inherit" onClick={logout}>

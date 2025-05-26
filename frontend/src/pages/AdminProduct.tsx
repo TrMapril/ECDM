@@ -42,10 +42,10 @@ const AdminProduct = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
-        Manage Products
+        Quản lí sản phẩm
       </Typography>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h6">Add Product</Typography>
+        <Typography variant="h6">Thêm sản phẩm</Typography>
         <TextField
           label="Name"
           value={newProduct.name}
@@ -72,17 +72,17 @@ const AdminProduct = () => {
           sx={{ mr: 2 }}
         />
         <Button variant="contained" onClick={handleCreate}>
-          Add
+          Thêm
         </Button>
       </Box>
       <Table>
         <TableHead>
           <TableRow>
             <TableCell>ID</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Category</TableCell>
-            <TableCell>Publisher</TableCell>
-            <TableCell>Price</TableCell>
+            <TableCell>Tên sản phẩm</TableCell>
+            <TableCell>Thể loại</TableCell>
+            <TableCell>NXB</TableCell>
+            <TableCell>Giá</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
@@ -93,13 +93,13 @@ const AdminProduct = () => {
               <TableCell>{product.name}</TableCell>
               <TableCell>{product.category}</TableCell>
               <TableCell>{product.publisher}</TableCell>
-              <TableCell>${product.price}</TableCell>
+              <TableCell>{product.price}VND</TableCell>
               <TableCell>
                 <Button variant="contained" onClick={() => setEditProduct(product)} sx={{ mr: 1 }}>
-                  Edit
+                  Chỉnh sửa
                 </Button>
                 <Button variant="contained" color="error" onClick={() => handleDelete(product.id)}>
-                  Delete
+                  Xoá
                 </Button>
               </TableCell>
             </TableRow>
@@ -108,7 +108,7 @@ const AdminProduct = () => {
       </Table>
       {editProduct && (
         <Box sx={{ mt: 3 }}>
-          <Typography variant="h6">Edit Product</Typography>
+          <Typography variant="h6">Chỉnh sửa</Typography>
           <TextField
             label="Name"
             value={editProduct.name}
@@ -135,10 +135,10 @@ const AdminProduct = () => {
             sx={{ mr: 2 }}
           />
           <Button variant="contained" onClick={handleUpdate}>
-            Update
+            Cập nhật
           </Button>
           <Button variant="outlined" onClick={() => setEditProduct(null)} sx={{ ml: 2 }}>
-            Cancel
+            Huỷ
           </Button>
         </Box>
       )}
