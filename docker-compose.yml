@@ -1,0 +1,129 @@
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - kong
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+  userservice:
+    build:
+      context: ./services/userservice
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./services/userservice/.env
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+  productservice:
+    build:
+      context: ./services/productservice
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    depends_on:
+      - postgres
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./services/productservice/.env
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+  cartservice:
+    build:
+      context: ./services/cartservice
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./services/cartservice/.env
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+  orderservice:
+    build:
+      context: ./services/orderservice
+      dockerfile: Dockerfile
+    ports:
+      - "3004:3004"
+    depends_on:
+      - postgres
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./services/orderservice/.env
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+  kong:
+    image: kong:latest
+    environment:
+      - KONG_DATABASE=off
+      - KONG_DECLARATIVE_CONFIG=/kong/declarative/kong.yml
+      - KONG_PROXY_LISTEN=0.0.0.0:8000
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    volumes:
+      - ./kong.yml:/kong/declarative/kong.yml
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=ecommerce
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+volumes:
+  pgdata:
+
+networks:
+  ecommerce-network:
+    driver: bridge
