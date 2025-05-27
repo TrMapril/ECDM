@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Cart from './pages/Cart';
 import Orders from './pages/Orders';
 import AdminProduct from './pages/AdminProduct';
+import AdminOrder from './pages/AdminOrder';
 
 function App() {
   const { user } = useAuth();
@@ -21,6 +22,10 @@ function App() {
         <Route
           path="/admin/products"
           element={user && user.role === 'admin' ? <AdminProduct /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/admin/orders"
+          element={user && user.role === 'admin' ? <AdminOrder /> : <Navigate to="/" />}
         />
       </Routes>
     </>

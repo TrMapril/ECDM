@@ -21,3 +21,10 @@ export const getOrderDetails = async (orderId: number, token: string): Promise<{
   });
   return response.data;
 };
+
+export const getAllOrders = async (token: string): Promise<Order[]> => {
+  const response = await api.get('/order/all', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data.orders;
+};

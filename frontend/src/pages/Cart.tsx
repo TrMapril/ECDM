@@ -1,23 +1,19 @@
 import { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Button, 
-  CircularProgress, 
-  Card, 
-  CardContent, 
-  Paper, 
+import {
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+  Card,
+  CardContent,
+  Paper,
   Divider,
   Grid,
   Container,
   Alert,
-  Chip
+  Chip,
 } from '@mui/material';
-import { 
-  ShoppingCart as CartIcon, 
-  Receipt as CheckoutIcon,
-  Refresh as RefreshIcon 
-} from '@mui/icons-material';
+import { ShoppingCart as CartIcon, Receipt as CheckoutIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 import CartItem from '../components/CartItem';
 import { useAuth } from '../context/AuthContext';
 import { getCart, clearCart } from '../services/cart';
@@ -35,23 +31,26 @@ const Cart = () => {
       setLoading(false);
       return;
     }
-   
+
     try {
       setError(null);
       const data = await getCart(token);
-      console.log('Fetched cart data:', data); // Debug log
-     
-      // Đảm bảo data là array
+      console.log('Fetched cart data:', data);
       if (Array.isArray(data)) {
-        setItems(data);
+        const formattedItems = data.map((item) => ({
+          ...item,
+          price: Number(item.price), // Chuyển chuỗi thành số
+          quantity: Number(item.quantity), // Chuyển chuỗi thành số
+        }));
+        setItems(formattedItems);
       } else {
         console.warn('Cart data is not an array:', data);
         setItems([]);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching cart:', err);
-      setError('Failed to load cart');
-      setItems([]); // Set empty array on error
+      setError(err.message || 'Failed to load cart');
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -63,27 +62,27 @@ const Cart = () => {
 
   const handleCheckout = async () => {
     if (!token || items.length === 0) return;
-   
+
     try {
       const orderItems = items.map((item) => ({
         productId: item.product_id,
         quantity: item.quantity,
         price: item.price,
       }));
-     
       await createOrder(orderItems, token);
       await clearCart(token);
       await fetchCart(); // Refresh cart after checkout
       alert('Order created successfully');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Checkout error:', err);
-      alert('Failed to create order');
+      alert(err.message || 'Failed to create order');
     }
   };
 
   // Calculate total price
-  const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const validItems = items.filter((item) => item.price != null && item.quantity != null);
+  const totalPrice = validItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalItems = validItems.reduce((sum, item) => sum + item.quantity, 0);
 
   // Loading state
   if (loading) {
@@ -108,12 +107,7 @@ const Cart = () => {
           <Alert severity="error" sx={{ mb: 3 }}>
             {error}
           </Alert>
-          <Button 
-            variant="contained" 
-            startIcon={<RefreshIcon />}
-            onClick={fetchCart}
-            size="large"
-          >
+          <Button variant="contained" startIcon={<RefreshIcon />} onClick={fetchCart} size="large">
             Try Again
           </Button>
         </Paper>
@@ -131,11 +125,7 @@ const Cart = () => {
             Giỏ hàng
           </Typography>
           {totalItems > 0 && (
-            <Chip 
-              label={`${totalItems} items`} 
-              color="primary" 
-              sx={{ ml: 2 }}
-            />
+            <Chip label={`${totalItems} items`} color="primary" sx={{ ml: 2 }} />
           )}
         </Box>
         <Typography variant="body1" color="text.secondary">
@@ -143,7 +133,7 @@ const Cart = () => {
         </Typography>
       </Box>
 
-      {!items || items.length === 0 ? (
+      {!validItems.length ? (
         // Empty Cart State
         <Paper elevation={2} sx={{ p: 6, textAlign: 'center' }}>
           <CartIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 3 }} />
@@ -153,11 +143,7 @@ const Cart = () => {
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
             Thêm sản phẩm để bắt đầu
           </Typography>
-          <Button 
-            variant="contained" 
-            size="large"
-            href="/"
-          >
+          <Button variant="contained" size="large" href="/">
             Tiếp tục mua hàng
           </Button>
         </Paper>
@@ -172,18 +158,15 @@ const Cart = () => {
                 </Typography>
               </Box>
               <Box sx={{ p: 2 }}>
-                {items.map((item, index) => (
-                  <Box key={`${item.id}-${item.product_id}`}>
-                    <CartItem
-                      item={item}
-                      token={token!}
-                      onUpdate={fetchCart}
-                    />
-                    {index < items.length - 1 && (
-                      <Divider sx={{ my: 2 }} />
-                    )}
-                  </Box>
-                ))}
+                {validItems.map((item, index) => {
+                  console.log(`Item ${index + 1}:`, { price: item.price, quantity: item.quantity });
+                  return (
+                    <Box key={`${item.id}-${item.product_id}`}>
+                      <CartItem item={item} token={token!} onUpdate={fetchCart} />
+                      {index < validItems.length - 1 && <Divider sx={{ my: 2 }} />}
+                    </Box>
+                  );
+                })}
               </Box>
             </Paper>
           </Grid>
@@ -195,7 +178,7 @@ const Cart = () => {
                 <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
                   Tổng giỏ hàng
                 </Typography>
-                
+
                 <Box sx={{ mb: 3 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                     <Typography variant="body2" color="text.secondary">
@@ -219,7 +202,7 @@ const Cart = () => {
                       Total
                     </Typography>
                     <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                      ${totalPrice.toFixed(2)}
+                      {isNaN(totalPrice) ? '0.00' : totalPrice.toFixed(2)}VND
                     </Typography>
                   </Box>
                 </Box>
@@ -230,18 +213,18 @@ const Cart = () => {
                   size="large"
                   startIcon={<CheckoutIcon />}
                   onClick={handleCheckout}
-                  disabled={items.length === 0}
-                  sx={{ 
-                    py: 1.5,
-                    fontSize: '1.1rem',
-                    fontWeight: 600
-                  }}
+                  disabled={validItems.length === 0}
+                  sx={{ py: 1.5, fontSize: '1.1rem', fontWeight: 600 }}
                 >
                   Checkout
                 </Button>
 
                 <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center' }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: 'block', textAlign: 'center' }}
+                  >
                     🔒 Secure checkout • Free shipping
                   </Typography>
                 </Box>

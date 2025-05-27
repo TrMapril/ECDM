@@ -202,7 +202,7 @@ const CartItem = ({ item, token, onUpdate }: CartItemProps) => {
                       />
                     )}
                     <Chip 
-                      label={`$${Number(safePrice).toFixed(2)} VND`} 
+                      label={`${Number(safePrice).toFixed(2)} VND`} 
                       size="small" 
                       variant="outlined"
                       color="primary"

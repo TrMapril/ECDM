@@ -23,9 +23,14 @@ const Header = () => {
               Đơn hàng
             </Button>
             {user.role === 'admin' && (
-              <Button color="inherit" component={Link} to="/admin/products">
-                Quản lí
-              </Button>
+              <>
+                <Button color="inherit" component={Link} to="/admin/products">
+                  Quản lý Sản phẩm
+                </Button>
+                <Button color="inherit" component={Link} to="/admin/orders">
+                  Quản lý Đơn hàng
+                </Button>
+              </>
             )}
             <Button color="inherit" onClick={logout}>
               Logout
